@@ -26,7 +26,7 @@ mongoose.connect(process.env.MONGO_URI,{
 .catch((err) => console.log(err))
 
 const server = require("http").createServer(app)
-const io = require("socket.io")(server, {cors:{origin:"*"}})
+const io = require("socket.io")(server, {cors:{origin:"https://rockpaperscissorsapp.onrender.com"}})
 io.on("connect", (socket) => {
   socket.on("joinRoom", async(room)=>{
     socket.join(room)
