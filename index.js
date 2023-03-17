@@ -13,7 +13,7 @@ app.use(express.json())
 app.use(express.urlencoded({extended: true}))
 app.use(cookieParser())
 app.use(cors({
-  origin:["https://rockpaperscissorsapp.onrender.com", process.env.GOOGLE_REDIRECT_URI],
+  origin:["https://rockpaperscissorsapp.onrender.com"],
   credentials: true
 }))
 app.use(router)
@@ -66,4 +66,4 @@ io.on("connect", (socket) => {
   })
 })
 
-server.listen(process.env.PORT, ()=>console.log(`server has started on port ${5000}`))
+server.listen(process.env.PORT, ()=>console.log(`server has started on port ${process.env.PORT}`))
