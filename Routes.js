@@ -285,7 +285,7 @@ router.post("/sendFriendRequest",verifyUser, async(req,res) => {
     await User.findOneAndUpdate({username: friendUsername},{
       $push: {notifications: {type: "friendRequest",sender: username, id: notificationId, text: "sent you a friend request", imgUrl: url}, friendRequestsReceived: username},
       }) 
-    await User.findByIdAndUpdate(id,{$push: { friendRequestsSent: friendUsername }})
+    await User.findByIdAndUpdate({_id: id},{$push: { friendRequestsSent: friendUsername }})
     res.json({msg: [...friendRequestsSent, friendUsername]})  
   } catch (error) {
     res.status(500).json({msg: "couldn't send friend request"})
@@ -300,7 +300,7 @@ router.post("/cancelFriendRequest",verifyUser, async(req,res) => {
     // since only one friend request can be made we can filter out the request with the next line of code 
     const newNotificationArray = otherUser.notifications.filter(item => item.type !== "friendRequest" && item.sender !== username)
     await User.findOneAndUpdate({username: friendUsername},{$pull: { friendRequestsReceived: username }, notifications: newNotificationArray}) 
-    await User.findByIdAndUpdate(id,{$pull: { friendRequestsSent: friendUsername }})
+    await User.findByIdAndUpdate({_id: id},{$pull: { friendRequestsSent: friendUsername }})
     res.json({msg: friendRequestsSent.filter(item => item !== friendUsername)})  
   } catch (error) {
     res.status(500).json({msg: "couldn't remove friend request"})
@@ -319,7 +319,7 @@ router.post("/acceptFriendRequest",verifyUser, async(req,res) => {
     await User.findOneAndUpdate({username: friendUsername},{friends: newFriendsList_Friend, friendRequestsSent: newRequestsSent_Friend})
 
     // update for user
-    await User.findByIdAndUpdate(id,{
+    await User.findByIdAndUpdate({_id: id},{
       $pull: { friendRequestsReceived: friendUsername }, 
       notifications:  notifications.filter(item => item.id !== notificationId), 
       $push: {friends: {username: friend.username, imgUrl: friend.url ?? "", messages: []}}
@@ -342,7 +342,7 @@ router.post("/rejectFriendRequest",verifyUser, async(req,res) => {
     await User.findOneAndUpdate({username: friendUsername},{notifications:newNotifications, friendRequestsSent: newRequestsSent_Friend})
 
     // update for user
-    await User.findByIdAndUpdate(id,{
+    await User.findByIdAndUpdate({_id: id},{
       $pull: { friendRequestsReceived: friendUsername }, 
       notifications:  notifications.filter(item => item.id !== notificationId), 
     })
@@ -358,7 +358,7 @@ router.post("/removeFriend",verifyUser, async(req,res) => {
   const {id, username, friends} = req.user
   try {
     await User.findOneAndUpdate({username: friendUsername},{$pull: { friends: {username: username} }}) 
-    await User.findByIdAndUpdate(id,{$pull: { friends: {username: friendUsername} }})
+    await User.findByIdAndUpdate({_id: id},{$pull: { friends: {username: friendUsername} }})
     res.json({msg: friends.filter(item => item.username !== friendUsername)})
   } catch (error) {
     res.status(500).json({msg: "couldn't remove friend"})
