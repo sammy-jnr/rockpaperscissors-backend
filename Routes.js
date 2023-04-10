@@ -200,15 +200,20 @@ router.post("/changeName",verifyUser, async(req,res) => {
     const { newName } = req.body
     const { id, friends, username } = req.user
     console.log(id)
-    const existingUser = await User.findOne({username: newName})
+    try {
+      const existingUser = await User.findOne({username: newName})
     if(existingUser){
       return res.status(400).json({msg: "a user with that username already exist"})
     }
-    await User.findByIdAndUpdate({id},{username: newName})
+    await User.findByIdAndUpdate({_id: id},{username: newName})
     res.json({newName})
     friends.forEach(async(item) => {
       await User.findOneAndUpdate({username: item.username, "friends.username": username},{ "friends.$.username": newName}) 
     })
+    } catch (error) {
+      console.log(error)
+    }
+    
 })
 
 router.post("/updateProfilePicture", upload.single("profile"),verifyUser, async(req,res) => {
